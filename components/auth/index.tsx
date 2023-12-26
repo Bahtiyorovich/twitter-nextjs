@@ -1,11 +1,33 @@
+"use client"
+
+import {useCallback} from  'react'
 import Image from "next/image"
 import Button from "../ui/button"
 import {FcGoogle} from 'react-icons/fc';
 import { FaGithub } from "react-icons/fa";
+import useRegisterModal from "@/hooks/useRegisterModal";
+import RegisterModal from '../modals/register-modal';
+import useLoginModal from '@/hooks/useLoginModal';
+import LoginModal from '../modals/login-modal';
 
 const Auth = () => {
+
+  const registerModal = useRegisterModal()
+  const loginModal = useLoginModal()
+
+  const onOpenRegisterModal = useCallback(() => {
+      registerModal.onOpen();
+    }, [registerModal])
+  
+  const onOpenLoginModal = useCallback(() => {
+    loginModal.onOpen();
+  }, [loginModal])
+
+
   return (
     <>
+      <RegisterModal/>
+      <LoginModal/>
       <div className="grid grid-cols-1 xl:grid-cols-2 lg:gap-12 content-center h-screen">
         <Image
           src={'/images/next.svg'}
@@ -46,6 +68,7 @@ const Auth = () => {
               <Button
                 label={'Create an Account'}
                 fullWidth
+                onClick={onOpenRegisterModal}
               />
               <div className="text-[10px] text-gray-400">
                 By signing up, you agre to the{""}
@@ -57,7 +80,7 @@ const Auth = () => {
           </div>
           <div className="w-full md:w-[60%]">
             <h5 className="text-xl mb-4">Already have an account?</h5>
-            <Button label={'Sign In'} fullWidth outline/>
+            <Button onClick={onOpenLoginModal} label={'Sign In'} fullWidth outline/>
           </div>
         </div>
       </div>

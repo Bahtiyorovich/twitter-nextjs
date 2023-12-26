@@ -14,7 +14,7 @@ interface ButtonProps {
 }
 const Button = ({label, disabled, fullWidth,secondary, large, outline, type, onClick}: ButtonProps) => {
   return (
-    <button className={cn(
+    <button onClick={onClick} className={cn(
       "rounded-full font-semibold border transition hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed",
       fullWidth ? 'w-full' : 'w-fit',
       secondary ? 'bg-white text-black' : 'bg-sky-500 text-white',
