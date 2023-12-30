@@ -27,7 +27,7 @@ const Modal = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="bg-neutral-800">
+        <DialogContent className="bg-black">
           <div className="flex items-center gap-6">
             <button onClick={onClose} className=" w-fit h-fit flex items-center rounded-full bg-slate-500 duration-200 hover:bg-white hover:text-black p-2">
               <X size={20} />

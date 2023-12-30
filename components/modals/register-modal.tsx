@@ -13,12 +13,19 @@ import Button from "../ui/button";
 import useLoginModal from "@/hooks/useLoginModal";
 import axios from 'axios'
 
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import { signIn } from "next-auth/react";
+
 const RegisterModal = () => {
 
   const [step, setStep] = useState(1)
   const [data, setData] = useState({name: '', email: ''})
-  const [nextData, setNextData] = useState({username: '', password: ''})
-
+  
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
 
@@ -27,7 +34,9 @@ const RegisterModal = () => {
     loginModal.onOpen();
   }, [registerModal, loginModal])
 
-  const bodyContent = step === 1 ? <RegisterStep1 setData={setData} setStep={setStep}/> : <RegisterStep2 setNextData={setNextData}/>
+  const bodyContent = step === 1 
+    ? <RegisterStep1 setData={setData} setStep={setStep}/> 
+    : <RegisterStep2 data={data}/>
 
   const footer = <div className="text-slate-300 text-center mb-4">Already have an Account? 
   <span
@@ -55,6 +64,9 @@ function RegisterStep1({
   setData: Dispatch<SetStateAction<{name: string, email: string}>>;
   setStep: Dispatch<SetStateAction<number>>;
 }){
+
+  const [error, setError] = useState('');
+
   const form = useForm<z.infer<typeof registerStep1Schema>>({
     resolver: zodResolver(registerStep1Schema),
     defaultValues: {
@@ -70,8 +82,13 @@ function RegisterStep1({
         setData(values)
         setStep(2)
       }
-    } catch (error) {
-        console.log(error)
+    } catch (error: any) {
+        if(error.response.data.error){
+          setError(error.response.data.error);
+        }
+        else {
+          setError('Something went wrong, Please try again');
+        }
     }
   }
 
@@ -80,6 +97,15 @@ function RegisterStep1({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4">
+        {error && (
+          <Alert variant="destructive">
+          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+        ) }
         <FormField
           control={form.control}
           name="name"
@@ -110,11 +136,10 @@ function RegisterStep1({
   )
 }
 
-function RegisterStep2({
-  setNextData,
-}: {
-  setNextData: Dispatch<SetStateAction<{username: string, password: string}>>;
-}){
+function RegisterStep2({data}:{data: {name: string, email: string}}){
+  
+  const [error, setError] = useState('');
+  const registerModal = useRegisterModal();
 
   const form = useForm<z.infer<typeof registerStep2Schema>>({
     resolver: zodResolver(registerStep2Schema),
@@ -124,8 +149,24 @@ function RegisterStep2({
     },
   })
 
-  function onSubmit(values: z.infer<typeof registerStep2Schema>) {
-    setNextData(values)
+  async function onSubmit(values: z.infer<typeof registerStep2Schema>) {
+    try {
+      const {data: response} = await axios.post("/api/auth/register?step=2",{...data,  ...values})
+      if(response.success){
+        signIn('credentials', {
+          email: data.email,
+          password:values.password,
+        })
+        registerModal.onClose();
+      }
+    } catch (error: any) {
+      if(error.response.data.error){
+        setError(error.response.data.error);
+      }
+      else {
+        setError('Something went wrong, Please try again');
+      }
+    }
   }
 
   const {isSubmitting} = form.formState
@@ -133,6 +174,15 @@ function RegisterStep2({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4">
+        {error && (
+          <Alert variant="destructive">
+          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+        )}
         <FormField
           control={form.control}
           name="username"

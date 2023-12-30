@@ -10,11 +10,20 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form'
 import { Input } from '../ui/input';
 import Button from '../ui/button';
 import useRegisterModal from '@/hooks/useRegisterModal';
+import axios from 'axios';
+
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons"
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert"
+import { signIn } from 'next-auth/react';
 
 
 const LoginModal = () => {
-
-  const [data, setData] = useState({email: "", password: "",})
+  
+  const [error, setError] = useState('');
   const loginTitle = 'Welcome Back!'
 
   const loginModal = useLoginModal();
@@ -25,34 +34,7 @@ const LoginModal = () => {
     registerModal.onOpen();
   },[loginModal,registerModal]);
 
-  const bodyContent = <LoginModalContent setData={setData}/>
-  const footer = <div className="text-slate-300 text-center mb-4">Create an Account? 
-      <span
-        onClick={onToggle} 
-        className="text-sky-500 duration-200 hover:underline cursor-pointer mx-2">
-          Sign Up
-      </span>
-    </div>
 
-
-  return (
-    <Modal
-      body={bodyContent}
-      footer={footer}
-      isOpen={loginModal.isOpen}
-      onClose={loginModal.onClose}
-      loginTitle={loginTitle}
-    />
-  )
-}
-
-export default LoginModal
-
-function LoginModalContent({
-  setData,
-}:{
-    setData: Dispatch<SetStateAction<{email: string, password: string}>>;
-  }){
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -61,14 +43,38 @@ function LoginModalContent({
     },
   })
 
-  function onSubmit(values: z.infer<typeof loginSchema>) {
-    setData(values)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    try {
+      const {data} = await axios.post('/api/auth/login',values)
+      if(data.success) {
+        signIn('credentials', values)
+        loginModal.onClose();
+      }
+    } catch (error: any) {
+      if(error.response.data.error){
+        setError(error.response.data.error);
+      }
+      else {
+        setError('Something went wrong, Please try again');
+      }
+    }
+
   }
 
   const {isSubmitting} = form.formState
-  return (
+
+  const bodyContent = (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 px-4">
+        {error && (
+          <Alert variant="destructive">
+          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+        )}
         <FormField
           control={form.control}
           name="email"
@@ -97,4 +103,25 @@ function LoginModalContent({
       </form>
     </Form>
   )
+  const footer = <div className="text-slate-300 text-center mb-4">Create an Account? 
+      <span
+        onClick={onToggle} 
+        className="text-sky-500 duration-200 hover:underline cursor-pointer mx-2">
+          Sign Up
+      </span>
+    </div>
+
+
+  return (
+    <Modal
+      body={bodyContent}
+      footer={footer}
+      isOpen={loginModal.isOpen}
+      onClose={loginModal.onClose}
+      loginTitle={loginTitle}
+    />
+  )
 }
+
+export default LoginModal
+

@@ -1,5 +1,6 @@
 import User from "@/database/user.model";
 import { connectToDatabase } from "@/lib/mongoose";
+import { hash } from "bcrypt";
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request, res: Response){
@@ -30,10 +31,19 @@ export async function POST(req: Request, res: Response){
         {status: 400}
         );
       {
-
     }
+      }
 
-  }
+    const hashedPassword = await hash(password, 10);
+
+    const user = await User.create({
+      email,
+      username,
+      name,
+      password: hashedPassword,
+    })
+
+    return NextResponse.json({success: true, user})
     }
 } catch(error) {
     const result = error as Error

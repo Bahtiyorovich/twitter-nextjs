@@ -9,12 +9,12 @@ import useRegisterModal from "@/hooks/useRegisterModal";
 import RegisterModal from '../modals/register-modal';
 import useLoginModal from '@/hooks/useLoginModal';
 import LoginModal from '../modals/login-modal';
+import {signIn} from 'next-auth/react'
 
 const Auth = () => {
 
   const registerModal = useRegisterModal()
   const loginModal = useLoginModal()
-
   const onOpenRegisterModal = useCallback(() => {
       registerModal.onOpen();
     }, [registerModal])
@@ -33,8 +33,9 @@ const Auth = () => {
           src={'/images/next.svg'}
           alt="X_logo"
           width={150}
-          height={200}
-          className="justify-self-center xl:w-[450px] xl:h-[250px] hidden md:block"
+          height={150}
+          priority
+          className="justify-self-center xl:w-[450px] hidden md:block"
         />
 
         <div className="flex flex-col justify-around items-center h-[70vh]">
@@ -43,8 +44,10 @@ const Auth = () => {
             <h2 className="font-bold text-2xl mb-4">Join today.</h2>
             <div className="flex flex-col space-y-2">
               <Button
+                onClick={()=> signIn('google')}
                 label={
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-center gap-4"
+                  >
                     <FcGoogle/>
                     <p>Sign Up with Google</p>
                   </div>
@@ -52,8 +55,10 @@ const Auth = () => {
                 fullWidth secondary
               />
               <Button
+                onClick={() => signIn('github')}
                 label={
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-center gap-4" 
+                  >
                     <FaGithub/>
                     <p>Sign Up with Github</p>
                   </div>
