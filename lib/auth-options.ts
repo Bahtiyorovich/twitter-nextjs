@@ -48,10 +48,10 @@ export const authOptions: AuthOptions = {
           image: session.user.image,
         });
         
-        session.currentuser = newUser;
+        session.currentUser = newUser;
       }
 
-      session.currentuser = isExistingUser;
+      session.currentUser = isExistingUser;
 
       return session;
     },
