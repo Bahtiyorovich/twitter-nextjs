@@ -11,8 +11,9 @@ interface ButtonProps {
   outline?: boolean;
   type?: 'button' | 'submit';
   onClick?: () => void;
+  classNames?: string;
 }
-const Button = ({label, disabled, fullWidth,secondary, large, outline, type, onClick}: ButtonProps) => {
+const Button = ({label, disabled, fullWidth,secondary, large, outline, type, onClick, classNames}: ButtonProps) => {
   return (
     <button onClick={onClick} type={type} disabled={disabled} className={cn(
       "rounded-full font-semibold border transition hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed",
@@ -21,7 +22,8 @@ const Button = ({label, disabled, fullWidth,secondary, large, outline, type, onC
       large ? 'text-xl px-5 py-3 ' : 'text-md px-4 py-3',
       outline 
         ? "bg-transparent border-slate-600 text-sky-500 hover:bg-slate-800/40"
-        : ""
+        : "",
+      classNames
     )}>{label}</button>
   )
 }

@@ -3,7 +3,7 @@ export interface IUser {
   username: string;
   email: string;
   name: string;
-  profileImage: string;
+  profileImage?: string;
   coverImage: string;
   updatedAt: Date;
   _id: string;
