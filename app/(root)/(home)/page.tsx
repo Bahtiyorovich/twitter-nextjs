@@ -46,7 +46,12 @@ const Page = () => {
           />
 
           {posts.map(post => (
-            <PostItem key={post._id} post={post} user={JSON.parse(JSON.stringify(session.currentUser))}  />
+            <PostItem 
+              key={post._id} 
+              post={post} 
+              user={JSON.parse(JSON.stringify(session.currentUser))}  
+              setPosts={setPosts}
+            />
           ))}
         </>
       ) }

@@ -30,7 +30,7 @@ const SidebarAccount = ({ user }: Props) => {
           <div className='flex justify-between items-center gap-2'>
             <div className='flex gap-2 items-center'>
             <Avatar>
-              <AvatarImage src={user.profileImage} />
+              <AvatarImage src={user?.profileImage} />
               <AvatarFallback>{user.name[0]}</AvatarFallback>
             </Avatar>
             <div className='flex flex-col items-start text-white'>
